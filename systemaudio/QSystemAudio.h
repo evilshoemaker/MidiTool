@@ -11,7 +11,7 @@ public:
 
 	void volumeMute(bool isEnable);
 	void setVolumeLevel(int value);
-	int volumeLevel();
+	int static volumeLevel();
 	int muteStatus();
 
 signals:

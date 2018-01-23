@@ -3,8 +3,7 @@
 
 #include <QDebug>
 
-#include "qmidi/QMidiOut.h"
-#include "qmidi/QMidiFile.h"
+#include "systemaudio/QSystemAudio.h"
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -14,9 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->setupUi(this);
 	setFixedSize(this->geometry().width(), this->geometry().height());
 
-	connect(audioWatcher_, &QSystemAudioWatcher::volumeLevelChanged, this, &MainWindow::onVolumeLevelChanged);
-	audioWatcher_->start();
-
+	init();
 	fillDeviceList();
 }
 
@@ -28,16 +25,31 @@ MainWindow::~MainWindow()
 void MainWindow::onVolumeLevelChanged(int value)
 {
 	ui->volumeLevelLabel->setText(QString::number(value));
+	if (running_) {
+		sendControlChange(value);
+	}
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::start()
 {
-	QMidiOut midi;
-	midi.connect("1");
+	QString outDeviceId = ui->midiDevicesComboBox->currentData().toString();
+	if (outDeviceId.isEmpty())
+		return;
 
-	midi.controlChange(12, 13, 120);
+	midi_.connect(outDeviceId);
+	ui->stratButton->setText("Stop");
+	ui->statusLabel->setText("Running");
+	running_ = true;
+	setEnableGui(false);
+}
 
-	midi.disconnect();
+void MainWindow::stop()
+{
+	midi_.disconnect();
+	running_ = false;
+	setEnableGui(true);
+	ui->stratButton->setText("Start");
+	ui->statusLabel->setText("Stopped");
 }
 
 void MainWindow::fillDeviceList()
@@ -48,4 +60,34 @@ void MainWindow::fillDeviceList()
 	for (const QString &key : vals.keys()) {
 		ui->midiDevicesComboBox->addItem(vals[key], key);
 	}
+}
+
+void MainWindow::sendControlChange(int value)
+{
+	midi_.controlChange(ui->channelSpinBox->value(),
+					   ui->controlNumberSpinBox->value(),
+						value);
+}
+
+void MainWindow::setEnableGui(bool flag)
+{
+	ui->channelSpinBox->setEnabled(flag);
+	ui->controlNumberSpinBox->setEnabled(flag);
+	ui->midiDevicesComboBox->setEnabled(flag);
+}
+
+void MainWindow::on_stratButton_clicked()
+{
+	if (running_) {
+		stop();
+	}
+	else {
+		start();
+	}
+}
+
+void MainWindow::init()
+{
+	connect(audioWatcher_, &QSystemAudioWatcher::volumeLevelChanged, this, &MainWindow::onVolumeLevelChanged);
+	audioWatcher_->start();
 }
