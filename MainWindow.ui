@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>334</width>
-    <height>166</height>
+    <height>189</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -171,6 +171,16 @@
        </spacer>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="autorunCheckBox">
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string>Autorun</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="Line" name="line">

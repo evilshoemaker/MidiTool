@@ -6,6 +6,8 @@
 #include "systemaudio/QSystemAudioWatcher.h"
 #include "qmidi/QMidiOut.h"
 
+#include "TrayIcon.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -25,10 +27,13 @@ private slots:
 
 	void on_stratButton_clicked();
 
+    void on_autorunCheckBox_toggled(bool checked);
+
 private:
 	Ui::MainWindow *ui;
 
-	QSystemAudioWatcher *audioWatcher_;
+    QSystemAudioWatcher *audioWatcher_ = nullptr;
+    TrayIcon *trayIcon_ = nullptr;
 
 	QMidiOut midi_;
 

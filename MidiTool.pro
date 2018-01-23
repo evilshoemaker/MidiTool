@@ -24,13 +24,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        MainWindow.cpp
+        MainWindow.cpp \
+    Util.cpp \
+    TrayIcon.cpp
 
-HEADERS  += MainWindow.h
+HEADERS  += MainWindow.h \
+    Util.h \
+    TrayIcon.h
 
 FORMS    += MainWindow.ui
 
 include(systemaudio/systemaudio.pri)
 include(qmidi/qmidi.pri)
 
-LIBS += -lOle32 -lUser32 -lcomsuppw -lwinmm
+LIBS += -lOle32 -lUser32 -lwinmm
+
+RESOURCES += \
+    resources.qrc

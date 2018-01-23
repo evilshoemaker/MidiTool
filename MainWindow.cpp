@@ -5,10 +5,13 @@
 
 #include "systemaudio/QSystemAudio.h"
 
+#include "Util.h"
+
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow),
-	audioWatcher_(new QSystemAudioWatcher(this))
+    audioWatcher_(new QSystemAudioWatcher(this)),
+    trayIcon_(new TrayIcon(this))
 {
 	ui->setupUi(this);
 	setFixedSize(this->geometry().width(), this->geometry().height());
@@ -25,8 +28,10 @@ MainWindow::~MainWindow()
 void MainWindow::onVolumeLevelChanged(int value)
 {
 	ui->volumeLevelLabel->setText(QString::number(value));
+
 	if (running_) {
-		sendControlChange(value);
+        int v = (value * 127) / 100;
+        sendControlChange(v);
 	}
 }
 
@@ -41,6 +46,7 @@ void MainWindow::start()
 	ui->statusLabel->setText("Running");
 	running_ = true;
 	setEnableGui(false);
+    trayIcon_->setRunning(running_);
 }
 
 void MainWindow::stop()
@@ -50,6 +56,7 @@ void MainWindow::stop()
 	setEnableGui(true);
 	ui->stratButton->setText("Start");
 	ui->statusLabel->setText("Stopped");
+    trayIcon_->setRunning(running_);
 }
 
 void MainWindow::fillDeviceList()
@@ -74,6 +81,7 @@ void MainWindow::setEnableGui(bool flag)
 	ui->channelSpinBox->setEnabled(flag);
 	ui->controlNumberSpinBox->setEnabled(flag);
 	ui->midiDevicesComboBox->setEnabled(flag);
+    ui->autorunCheckBox->setEnabled(flag);
 }
 
 void MainWindow::on_stratButton_clicked()
@@ -88,6 +96,15 @@ void MainWindow::on_stratButton_clicked()
 
 void MainWindow::init()
 {
+    ui->autorunCheckBox->setChecked(Util::isAutorun());
+
 	connect(audioWatcher_, &QSystemAudioWatcher::volumeLevelChanged, this, &MainWindow::onVolumeLevelChanged);
 	audioWatcher_->start();
+
+    trayIcon_->show();
+}
+
+void MainWindow::on_autorunCheckBox_toggled(bool checked)
+{
+    Util::setAutorun(checked);
 }
