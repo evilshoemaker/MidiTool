@@ -133,6 +133,40 @@ int QSystemAudio::volumeLevel()
 	return currentVolume * 100;
 }
 
+int QSystemAudio::volumeLevel(const QString &id)
+{
+	float currentVolume = -1;
+	HRESULT hr = CoInitialize(NULL);
+
+	if (SUCCEEDED(hr))
+	{
+		IMMDeviceEnumerator *pEnum = NULL;
+		hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void **)&pEnum);
+
+		if (SUCCEEDED(hr)) {
+			IMMDevice *device;
+			LPCWSTR deviceId = (const wchar_t*) id.utf16();;
+
+			hr = pEnum->GetDevice(deviceId, &device);
+			if (SUCCEEDED(hr)) {
+				IAudioEndpointVolume* endpointVolume = NULL;
+				hr = device->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID *)&endpointVolume);
+				if (SUCCEEDED(hr)) {
+					endpointVolume->GetMasterVolumeLevelScalar(&currentVolume);
+					endpointVolume->Release();
+				}
+
+				device->Release();
+			}
+
+			pEnum->Release();
+		}
+	}
+
+	CoUninitialize();
+	return currentVolume * 100;
+}
+
 int QSystemAudio::muteStatus()
 {
 	CoInitialize(NULL);
@@ -168,7 +202,6 @@ QMap<QString, QString> QSystemAudio::devices()
 	if (SUCCEEDED(hr))
 	{
 		IMMDeviceEnumerator *pEnum = NULL;
-
 		hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void **)&pEnum);
 
 		if (SUCCEEDED(hr))

@@ -20,9 +20,21 @@ void QSystemAudioWatcher::stop()
 
 void QSystemAudioWatcher::onTimerTick()
 {
-	int value = systemAudio.volumeLevel();
+	int value = -100;
+	if (currentDeviceId_.isEmpty()) {
+		value = QSystemAudio::volumeLevel();
+	}
+	else {
+		value = QSystemAudio::volumeLevel(currentDeviceId_);
+	}
+
 	if (value != currentVolumeLevel_) {
 		currentVolumeLevel_ = value;
 		emit volumeLevelChanged(currentVolumeLevel_);
 	}
+}
+
+void QSystemAudioWatcher::setCurrentDeviceId(const QString &currentDeviceId)
+{
+	currentDeviceId_ = currentDeviceId;
 }

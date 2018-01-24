@@ -109,6 +109,7 @@ void MainWindow::setEnableGui(bool flag)
 	ui->controlNumberSpinBox->setEnabled(flag);
 	ui->midiDevicesComboBox->setEnabled(flag);
 	ui->autorunCheckBox->setEnabled(flag);
+	ui->audioDevicesComboBox->setEnabled(flag);
 }
 
 void MainWindow::on_stratButton_clicked()
@@ -187,4 +188,10 @@ QString MainWindow::configFilePath()
 {
 	QString path = QDir::toNativeSeparators(QCoreApplication::applicationDirPath() + "/config.ini");
 	return path;
+}
+
+void MainWindow::on_audioDevicesComboBox_currentIndexChanged(int index)
+{
+	Q_UNUSED(index);
+	audioWatcher_->setCurrentDeviceId(ui->audioDevicesComboBox->currentData().toString());
 }

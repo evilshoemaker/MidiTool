@@ -32,6 +32,8 @@ private slots:
 	void on_stratButton_clicked();
     void on_autorunCheckBox_toggled(bool checked);
 
+	void on_audioDevicesComboBox_currentIndexChanged(int index);
+
 private:
 	void closeEvent(QCloseEvent *event);
 

@@ -12,6 +12,7 @@ public:
 	void volumeMute(bool isEnable);
 	void setVolumeLevel(int value);
 	int static volumeLevel();
+	int static volumeLevel(const QString &id);
 	int muteStatus();
 	static QMap<QString, QString> devices();
 
