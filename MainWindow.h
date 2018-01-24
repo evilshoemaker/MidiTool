@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QCloseEvent>
 
 #include "systemaudio/QSystemAudioWatcher.h"
 #include "qmidi/QMidiOut.h"
@@ -25,9 +26,13 @@ private slots:
 	void start();
 	void stop();
 
-	void on_stratButton_clicked();
+	void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
+	void on_stratButton_clicked();
     void on_autorunCheckBox_toggled(bool checked);
+
+private:
+	void closeEvent(QCloseEvent *event);
 
 private:
 	Ui::MainWindow *ui;

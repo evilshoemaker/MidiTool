@@ -11,11 +11,19 @@ class TrayIcon : public QSystemTrayIcon
 public:
     explicit TrayIcon(QObject *parent = nullptr);
 
+signals:
+	void showMainWindow();
+	void quit();
+	void startStop();
+
 public slots:
     void setRunning(bool flag);
 
 private:
     QMenu *createMenu();
+	QAction *showMainWindowAction_ = nullptr;
+	QAction *quitAction_ = nullptr;
+	QAction *startStopAction_ = nullptr;
 };
 
 #endif // TRAYICON_H
