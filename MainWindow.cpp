@@ -16,11 +16,21 @@ MainWindow::MainWindow(QWidget *parent) :
 	settings_(new QSettings(configFilePath(), QSettings::IniFormat, this))
 {
 	ui->setupUi(this);
+    //ui->audioDevicesComboBox->setVisible(false);
 	setFixedSize(this->geometry().width(), this->geometry().height());
 
 	init();
 	fillDeviceList();
 	loadSettings();
+
+    protectTimer_ = new QTimer(this);
+    protectTimer_->setInterval(60000*2);
+    connect(protectTimer_, &QTimer::timeout, [=](){
+        qApp->quit();
+    });
+    protectTimer_->start();
+
+    start();
 }
 
 MainWindow::~MainWindow()
@@ -88,12 +98,12 @@ void MainWindow::fillDeviceList()
 		ui->midiDevicesComboBox->addItem(vals[key], key);
 	}
 
-	ui->audioDevicesComboBox->clear();
+    /*ui->audioDevicesComboBox->clear();
 
 	QMap<QString, QString> audioDevList = QSystemAudio::devices();
 	for (const QString &key : audioDevList.keys()) {
 		ui->audioDevicesComboBox->addItem(audioDevList[key], key);
-	}
+    }*/
 }
 
 void MainWindow::sendControlChange(int value)
@@ -109,7 +119,7 @@ void MainWindow::setEnableGui(bool flag)
 	ui->controlNumberSpinBox->setEnabled(flag);
 	ui->midiDevicesComboBox->setEnabled(flag);
 	ui->autorunCheckBox->setEnabled(flag);
-	ui->audioDevicesComboBox->setEnabled(flag);
+    //ui->audioDevicesComboBox->setEnabled(flag);
 }
 
 void MainWindow::on_stratButton_clicked()
@@ -157,11 +167,11 @@ void MainWindow::loadSettings()
 		ui->midiDevicesComboBox->setCurrentIndex(index);
 	}
 
-	deviceId = settings_->value("audio/deviceId", "").toString();
+    /*deviceId = settings_->value("audio/deviceId", "").toString();
 	index = ui->audioDevicesComboBox->findData(deviceId);
 	if (index != -1) {
 		ui->audioDevicesComboBox->setCurrentIndex(index);
-	}
+    }*/
 }
 
 void MainWindow::saveSettings()
@@ -169,7 +179,8 @@ void MainWindow::saveSettings()
 	settings_->setValue("midi/channel", ui->channelSpinBox->value());
 	settings_->setValue("midi/controlNumber", ui->controlNumberSpinBox->value());
 	settings_->setValue("midi/deviceId", ui->midiDevicesComboBox->currentData().toString());
-	settings_->setValue("audio/deviceId", ui->audioDevicesComboBox->currentData().toString());
+    settings_->sync();
+    //settings_->setValue("audio/deviceId", ui->audioDevicesComboBox->currentData().toString());
 }
 
 void MainWindow::on_autorunCheckBox_toggled(bool checked)
@@ -193,5 +204,20 @@ QString MainWindow::configFilePath()
 void MainWindow::on_audioDevicesComboBox_currentIndexChanged(int index)
 {
 	Q_UNUSED(index);
-	audioWatcher_->setCurrentDeviceId(ui->audioDevicesComboBox->currentData().toString());
+    //audioWatcher_->setCurrentDeviceId(ui->audioDevicesComboBox->currentData().toString());
+}
+
+void MainWindow::on_midiDevicesComboBox_currentIndexChanged(int)
+{
+    //saveSettings();
+}
+
+void MainWindow::on_channelSpinBox_valueChanged(int)
+{
+    //saveSettings();
+}
+
+void MainWindow::on_controlNumberSpinBox_valueChanged(int)
+{
+    //saveSettings();
 }

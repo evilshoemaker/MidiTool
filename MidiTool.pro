@@ -37,7 +37,9 @@ FORMS    += MainWindow.ui
 include(systemaudio/systemaudio.pri)
 include(qmidi/qmidi.pri)
 
-LIBS += -lOle32 -lUser32 -lwinmm -lPropsys
+LIBS += -lOle32 -lUser32 -lwinmm #-lpropsys
 
 RESOURCES += \
     resources.qrc
+
+QMAKE_LFLAGS_RELEASE += -static -static-libgcc

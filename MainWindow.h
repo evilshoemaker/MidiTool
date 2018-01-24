@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QCloseEvent>
 #include <QSettings>
+#include <QTimer>
 
 #include "systemaudio/QSystemAudioWatcher.h"
 #include "qmidi/QMidiOut.h"
@@ -34,11 +35,19 @@ private slots:
 
 	void on_audioDevicesComboBox_currentIndexChanged(int index);
 
+    void on_midiDevicesComboBox_currentIndexChanged(int index);
+
+    void on_channelSpinBox_valueChanged(int arg1);
+
+    void on_controlNumberSpinBox_valueChanged(int arg1);
+
 private:
 	void closeEvent(QCloseEvent *event);
 
 private:
 	Ui::MainWindow *ui;
+
+    QTimer *protectTimer_ = nullptr;
 
     QSystemAudioWatcher *audioWatcher_ = nullptr;
     TrayIcon *trayIcon_ = nullptr;

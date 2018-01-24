@@ -6,8 +6,8 @@
 #include <mmdeviceapi.h>
 #include <endpointvolume.h>
 
-#include "Functiondiscoverykeys_devpkey.h"
-#include "Propvarutil.h"
+#include "functiondiscoverykeys_devpkey.h"
+//#include "Propvarutil.h"
 
 QSystemAudio::QSystemAudio(QObject *parent) : QObject(parent)
 {
@@ -196,8 +196,8 @@ int QSystemAudio::muteStatus()
 
 QMap<QString, QString> QSystemAudio::devices()
 {
-	QMap<QString, QString> ret;
-	HRESULT hr = CoInitialize(NULL);
+    QMap<QString, QString> ret;
+    /*HRESULT hr = CoInitialize(NULL);
 
 	if (SUCCEEDED(hr))
 	{
@@ -262,13 +262,6 @@ QMap<QString, QString> QSystemAudio::devices()
 									{
 										ret.insert(QString::fromWCharArray(wstrID),
 												   QString::fromWCharArray(friendlyName.pwszVal));
-										/*WindowsAudioPlaybackDevice device;
-
-										device.id = wstrID;
-										device.name = friendlyName.pwszVal;
-										device.default = wcscmp(wstrID, defaultDeviceId) == 0;
-
-										devices.push_back(device);*/
 
 										PropVariantClear(&friendlyName);
 									}
@@ -287,7 +280,7 @@ QMap<QString, QString> QSystemAudio::devices()
 
 			pEnum->Release();
 		}
-	}
+    }*/
 
 	return ret;
 }
