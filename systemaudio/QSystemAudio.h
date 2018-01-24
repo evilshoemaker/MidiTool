@@ -13,6 +13,7 @@ public:
 	void setVolumeLevel(int value);
 	int static volumeLevel();
 	int muteStatus();
+	static QMap<QString, QString> devices();
 
 signals:
 

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QCloseEvent>
+#include <QSettings>
 
 #include "systemaudio/QSystemAudioWatcher.h"
 #include "qmidi/QMidiOut.h"
@@ -39,10 +40,15 @@ private:
 
     QSystemAudioWatcher *audioWatcher_ = nullptr;
     TrayIcon *trayIcon_ = nullptr;
+	QSettings *settings_ = nullptr;
 
 	QMidiOut midi_;
 
+	QString configFilePath();
+
 	void init();
+	void loadSettings();
+	void saveSettings();
 	void fillDeviceList();
 	void sendControlChange(int value);
 	void setEnableGui(bool flag);

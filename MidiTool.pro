@@ -37,7 +37,7 @@ FORMS    += MainWindow.ui
 include(systemaudio/systemaudio.pri)
 include(qmidi/qmidi.pri)
 
-LIBS += -lOle32 -lUser32 -lwinmm
+LIBS += -lOle32 -lUser32 -lwinmm -lPropsys
 
 RESOURCES += \
     resources.qrc

@@ -6,6 +6,9 @@
 #include <mmdeviceapi.h>
 #include <endpointvolume.h>
 
+#include "Functiondiscoverykeys_devpkey.h"
+#include "Propvarutil.h"
+
 QSystemAudio::QSystemAudio(QObject *parent) : QObject(parent)
 {
 
@@ -156,3 +159,177 @@ int QSystemAudio::muteStatus()
 
 	return muteStatus;
 }
+
+QMap<QString, QString> QSystemAudio::devices()
+{
+	QMap<QString, QString> ret;
+	HRESULT hr = CoInitialize(NULL);
+
+	if (SUCCEEDED(hr))
+	{
+		IMMDeviceEnumerator *pEnum = NULL;
+
+		hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void **)&pEnum);
+
+		if (SUCCEEDED(hr))
+		{
+			LPWSTR defaultDeviceId = NULL;
+			IMMDevice *pDefaultDevice;
+
+			HRESULT hr = pEnum->GetDefaultAudioEndpoint(eRender, eMultimedia, &pDefaultDevice);
+
+			if (SUCCEEDED(hr))
+			{
+				hr = pDefaultDevice->GetId(&defaultDeviceId);
+
+				if (!SUCCEEDED(hr))
+				{
+					defaultDeviceId = NULL;
+				}
+
+				pDefaultDevice->Release();
+			}
+
+			IMMDeviceCollection *pDevices;
+
+			hr = pEnum->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &pDevices);
+
+			if (SUCCEEDED(hr))
+			{
+				UINT count;
+
+				pDevices->GetCount(&count);
+
+				if (SUCCEEDED(hr))
+				{
+					for (UINT i = 0; i < count; ++i)
+					{
+						IMMDevice *pDevice;
+						HRESULT hr = pDevices->Item(i, &pDevice);
+
+						if (SUCCEEDED(hr))
+						{
+							LPWSTR wstrID = NULL;
+
+							hr = pDevice->GetId(&wstrID);
+
+							if (SUCCEEDED(hr))
+							{
+								IPropertyStore *pStore;
+								hr = pDevice->OpenPropertyStore(STGM_READ, &pStore);
+
+								if (SUCCEEDED(hr))
+								{
+									PROPVARIANT friendlyName;
+
+									PropVariantInit(&friendlyName);
+									hr = pStore->GetValue(PKEY_Device_FriendlyName, &friendlyName);
+
+									if (SUCCEEDED(hr))
+									{
+										ret.insert(QString::fromWCharArray(wstrID),
+												   QString::fromWCharArray(friendlyName.pwszVal));
+										/*WindowsAudioPlaybackDevice device;
+
+										device.id = wstrID;
+										device.name = friendlyName.pwszVal;
+										device.default = wcscmp(wstrID, defaultDeviceId) == 0;
+
+										devices.push_back(device);*/
+
+										PropVariantClear(&friendlyName);
+									}
+
+									pStore->Release();
+								}
+							}
+
+							pDevice->Release();
+						}
+					}
+				}
+
+				pDevices->Release();
+			}
+
+			pEnum->Release();
+		}
+	}
+
+	return ret;
+}
+
+/*void QSystemAudio::devices()
+{
+	HRESULT hr = CoInitialize(NULL);
+	if (SUCCEEDED(hr))
+	{
+		IMMDeviceEnumerator *pEnum = NULL;
+		hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void **)&pEnum);
+
+		if (SUCCEEDED(hr))
+		{
+			IMMDeviceCollection *pDevices;
+			hr = pEnum->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &pDevices);
+
+			if (SUCCEEDED(hr))
+			{
+				UINT count;
+
+				pDevices->GetCount(&count);
+
+				if (SUCCEEDED(hr))
+				{
+					for (unsigned int deviceIndex = 0; deviceIndex < count; deviceIndex++) {
+						IMMDevice *pDevice;
+						hr = pDevices->Item(deviceIndex, &pDevice);
+
+						if (SUCCEEDED(hr))
+						{
+							LPWSTR wstrID = NULL;
+
+							hr = pDevice->GetId(&wstrID);
+
+							if (SUCCEEDED(hr))
+							{
+								IPropertyStore *pStore;
+								hr = pDevice->OpenPropertyStore(STGM_READ, &pStore);
+
+								if (SUCCEEDED(hr))
+								{
+									PROPVARIANT friendlyName;
+
+									PropVariantInit(&friendlyName);
+									hr = pStore->GetValue(PKEY_Device_FriendlyName, &friendlyName);
+
+									if (SUCCEEDED(hr))
+									{
+										WCHAR szTitle[128];
+										hr = PropVariantToString(friendlyName, szTitle, ARRAYSIZE(szTitle));
+
+										if (SUCCEEDED(hr)) {
+											QString title = QString::fromWCharArray(szTitle);
+											qDebug() << title;
+										}
+
+										PropVariantClear(&friendlyName);
+									}
+
+									pStore->Release();
+								}
+							}
+
+							pDevice->Release();
+						}
+					}
+				}
+
+				pDevices->Release();
+			}
+
+			pEnum->Release();
+		}
+	}
+
+	//return result;
+}*/
