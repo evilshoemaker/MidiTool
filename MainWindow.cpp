@@ -22,14 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	init();
 	fillDeviceList();
 	loadSettings();
-
-    protectTimer_ = new QTimer(this);
-    protectTimer_->setInterval(60000*2);
-    connect(protectTimer_, &QTimer::timeout, [=](){
-        qApp->quit();
-    });
-    protectTimer_->start();
-
     start();
 }
 

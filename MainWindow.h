@@ -47,8 +47,6 @@ private:
 private:
 	Ui::MainWindow *ui;
 
-    QTimer *protectTimer_ = nullptr;
-
     QSystemAudioWatcher *audioWatcher_ = nullptr;
     TrayIcon *trayIcon_ = nullptr;
 	QSettings *settings_ = nullptr;
